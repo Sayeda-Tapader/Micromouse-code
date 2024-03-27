@@ -1,4 +1,4 @@
-/** DO NOT CHANGE THE FOLLOWING DEFINITONS - From UKMARS MazeRunner GitHub **/
+/** DO NOT CHANGE THE FOLLOWING DEFINITONS - From UKMARS MazeRunner GitHub - DO NOT WORRY ABOUT IT **/
 /** =============================================================================================================== **/
 #if defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__)
 #define __digitalPinToPortReg(P) (((P) <= 7) ? &PORTD : (((P) >= 8 && (P) <= 13) ? &PORTB : &PORTC))
@@ -29,7 +29,7 @@
 #endif
 
 /** =============================================================================================================== **/
-
+    // CODE STARTS HERE
 /** DEFINE OUR PINS AND WHICH COMPONENTS THEY ARE CONNECTED TO **/
 /** _______________________________________________________________________________________________________________ **/
 const int ENCODER_R_A = 3; // ENCODER RIGHT A (ticks first when motor forward)
@@ -44,6 +44,20 @@ const int SPEED_MOTOR_R = 10; // PWM MOTOR RIGHT
 const int DIR_MOTOR_L = 7; // DIRECTION MOTOR LEFT 
 const int DIR_MOTOR_R = 8; // DIRECTION MOTOR RIGHT 
 
+//____________________________________________________________________________
+const int EMITTERS = 12; // EMITTERS
+const int RED_LED = 13; // RED LED AT H BRIDGE
+
+const int INDICATOR_LED_R = 6; // INDICATOR LED RIGHT 
+const int INDICATOR_LED_L = 11; // INDICATOR LED LEFT
+
+// Phototransistors
+const int RIGHT_SENSOR = A0;
+const int LEFT_SENSOR = A2;
+const int MIDDLE_SENSOR = A1;
+
+//____________________________________________________________________________
+
 // 4 Way switch and push button
 const int DIP_SWITCH = A6; 
 /** _______________________________________________________________________________________________________________ **/
@@ -57,10 +71,12 @@ volatile int leftEncoderPos = 0; // Counts for left encoder ticks
 int prevTime = 0;
 int prevError;
 int errorIntegral;
-bool switchOn;
+bool switchOn = false;
 
 void setup() {
   Serial.begin(9600);
+  
+  //_________________MOTORS AND ENCODERS________
   pinMode(ENCODER_R_A, INPUT_PULLUP);
   pinMode(ENCODER_R_B, INPUT_PULLUP);
   pinMode(ENCODER_L_A, INPUT_PULLUP);
@@ -70,6 +86,16 @@ void setup() {
   pinMode(SPEED_MOTOR_R, OUTPUT);
   pinMode(DIR_MOTOR_L, OUTPUT);
   pinMode(DIR_MOTOR_R, OUTPUT);
+  //__________________________________________
+
+  pinMode(DIP_SWITCH, INPUT_PULLUP); 
+
+  //________________LEDS_____________________
+  pinMode(EMITTERS, OUTPUT);
+  pinMode(RED_LED, OUTPUT);
+  pinMode(INDICATOR_LED_R, OUTPUT);
+  pinMode(INDICATOR_LED_L, OUTPUT);
+  //_________________________________________
 
   attachInterrupt(digitalPinToInterrupt(ENCODER_L_B), readEncoderLeft, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_R_A), readEncoderRight, CHANGE);
@@ -146,6 +172,7 @@ void readEncoderRight() {
     @params dir - can either be HIGH or LOW for clockwise / counter clockwise rotation
     @params speed - analogWrite() value between 0-255
 **/
+//==============================================================================================
 void setMotors(int dir, int speed){
   analogWrite(SPEED_MOTOR_L, speed);
   analogWrite(SPEED_MOTOR_R, speed);
@@ -161,6 +188,7 @@ void setMotors(int dir, int speed){
     analogWrite(SPEED_MOTOR_R, 0);
   }
 }
+//==============================================================================================
 
 /** Function to make the robot travel for a certain amount of encoder ticks, calls upon setMotors at end
     @params dir - setPoint: The target value for how far we want to go (in encoder ticks)
@@ -195,35 +223,16 @@ void motorPID(int setPoint, float kp, float ki, float kd){
   setMotors(dir, speed);
   prevError = 0;
 }
-
+//==============================================================================================
 //==============================================================================================
 // YOUR HOMEWORK ASSIGNMENT: Create a function to convert from encoder ticks to centimeters!
 int tickConvertToCm(int encoderTicks){
   // Your code here 
+  return 0;
 }
 //==============================================================================================
 
-void loop(){
-
-  // Starter Code
-
-  int dipSwitch = analogRead(DIP_SWITCH);
-  //Serial.println(dipSwitch);
-  if(dipSwitch > 1000){
-    switchOn = true;
-  }
-
-  if(switchOn){
-    delay(500); // Wait half a second after pressing the button to actually start moving, safety first!
-    int setPoint = 1000;
-    float kp = 1;
-    float ki = 0.1;
-    float kd = 0.001;
-    motorPID(setPoint, kp, ki, kd);
-
-    Serial.print(setPoint);
-    Serial.print(" ");
-    Serial.print(rightEncoderPos);
-    Serial.println();
-  }
+void loop() {
+  digitalWrite(EMITTERS, HIGH);
+  Serial.println(analogRead(RIGHT_SENSOR));
 }
