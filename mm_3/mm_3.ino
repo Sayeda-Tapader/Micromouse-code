@@ -315,6 +315,18 @@ void loop() {
     turnR(80);
   }
 
+  //printing sensor values in order R M L
+  Serial.print(R);
+  Serial.print("\t");
+  Serial.print(M);
+  Serial.print("\t");
+  Serial.println(L);
+
+  /*not sure why Zak put this in the starter code*/
+  digitalWrite(EMITTERS, HIGH);
+  Serial.println(analogRead(R));
+  //=============================================
+
   delay(5);
 
 }
