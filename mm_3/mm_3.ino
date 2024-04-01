@@ -290,10 +290,34 @@ int tickConvertToCm(int encoderTicks){
 
 
 void loop() {
-  // I have to set up the sensors
+   // I have to set up the sensors
   R = digitalRead(SR);
   M = digitalRead(SM);
   L = digitalRead(SL);
+
+  int dipSwitch = analogRead(DIP_SWITCH);
+  if (dipSwitch > 1000) {
+      delay(500);
+      // Call function to detect wall and rotate
+      detectWallAndRotate();
+  } else {
+    //forward
+    if (L != 0 && M == 0 && R != 0){
+      setMotors(1, 80);
+    }//reverse
+    if (L != 0 && M != 0 && R != 0){
+      setMotors(-1, 80);
+    }//ONLY left
+    if (L == 0 && M != 0 && R != 0){
+      turnL(80);
+    }//ONLY right
+    if (L != 0 && M != 0 && R == 0){
+      turnR(80);
+    }
+      // Implement your PID control or other navigation logic here
+  }
+
+ 
 
 /* digitalRead() for 0 or 1 - WHITE is 0 and BLACK is 1
   although the phototransistors are analogue pins [A0, A1, A2] we want the easier 
@@ -302,31 +326,37 @@ void loop() {
 
   /**TRUTH CASES**///basic lot just to have it move forward and turn functionalities
   //forward
-  if (L == 1 && M == 0 && R == 1){
-    setMotors(1, 80);
-  }//reverse
-  if (L == 1 && M == 1 && R == 1){
-    setMotors(-1, 80);
-  }//ONLY left
-  if (L == 0 && M == 1 && R == 1){
-    turnL(80);
-  }//ONLY right
-  if (L == 1 && M == 1 && R == 0){
-    turnR(80);
-  }
+  // if (L != 0 && M == 0 && R != 0){
+  //   setMotors(1, 80);
+  // }//reverse
+  // if (L != 0 && M != 0 && R != 0){
+  //   setMotors(-1, 80);
+  // }//ONLY left
+  // if (L == 0 && M != 0 && R != 0){
+  //   turnL(80);
+  // }//ONLY right
+  // if (L != 0 && M != 0 && R == 0){
+  //   turnR(80);
+  // }
 
   //printing sensor values in order R M L
-  Serial.print(R);
-  Serial.print("\t");
-  Serial.print(M);
-  Serial.print("\t");
-  Serial.println(L);
+  // Serial.print(R);
+  // Serial.print("\t");
+  // Serial.print(M);
+  // Serial.print("\t");
+  // Serial.println(L);
 
   /*not sure why Zak put this in the starter code*/
   digitalWrite(EMITTERS, HIGH);
+  Serial.println(analogRead(L));
+  Serial.print("\t");
+  Serial.println(analogRead(M));
+  Serial.print("\t");
   Serial.println(analogRead(R));
   //=============================================
 
-  delay(5);
+  
+
+  delay(10);
 
 }
